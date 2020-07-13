@@ -62,7 +62,7 @@
   {% for space in spaces %}
 
           <div class="col mb-4">
-          <div class="card" style="background-color: {{space.card_color()}};">
+          <div class="card border-white" style="{{space.card_background()}}">
               <div class="card-body ">
                 <h5 class="card-title">{{space.name}}</h5>
                 <p class="card-text">{{space.description}}</p>
