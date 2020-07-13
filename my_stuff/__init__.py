@@ -20,7 +20,7 @@ def create_app():
     login_manager.init_app(app)
 
     with app.app_context():
-        from . import routes
+        from my_stuff.routes import routes
         from . import auth
         # from .assets import compile_assets
 
