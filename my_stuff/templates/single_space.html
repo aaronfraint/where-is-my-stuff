@@ -1,0 +1,134 @@
+{% extends "navbar_logged_in.html" %}
+
+{% block content %}
+
+
+<div class="container">
+
+  <div class="row mt-4">
+    <div class="col">
+      <h1>{{ space.name }}</h1>
+      <p>{{space.description}}</p>
+    </div>
+  </div>
+
+  <hr>
+
+
+  <div class="row">
+    <div class="col">
+      Filter by category:
+      {% for category in space.container_categories %}
+        <button type="button" class="btn btn-outline-primary mb-1">{{ category.name }}</button>
+      {% endfor %}
+  
+    </div>
+  </div>
+
+  <div class="row">
+
+    <div class="col-md">
+      <form method="POST" action="{{ request.path }}/add/container">
+        {{ container_form.csrf_token }}
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Add Container</th>
+              <th scope="col">Pick Category</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <div class="form-group">
+                <td><input type="name" class="form-control" id="container_name" name="container_name" placeholder="e.g. Box"></td>
+                <td>
+                  <select class="form-control" id="category" name="category">
+                    {% for category in space.container_categories %}
+                    <option>{{ category.name }}</option>
+                    {% endfor %}
+                  </select>
+                </td>
+                <td><button type="submit" name="container" class="btn btn-primary">+</button></td>
+              </div>
+            </tr>
+          </tbody>
+        </table>
+
+        {% if container_form.container_name.errors %}
+          <ul class="errors">
+            {% for error in container_form.container_name.errors %}
+              <li>{{ error }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+            
+        </form>
+    </div>
+
+    <div class="col-md">
+      <form method="POST" action="{{ request.path }}/add/category">
+        {{ category_form.csrf_token }}
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Add Category</th>
+
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <div class="form-group">
+                <td><input type="name" class="form-control" id="category_name" name="category_name" placeholder="e.g. Box"></td>
+
+                <td><button type="submit" name="category" class="btn btn-primary">+</button></td>
+              </div>
+            </tr>
+          </tbody>
+        </table>
+
+        {% if category_form.category_name.errors %}
+          <ul class="errors">
+            {% for error in category_form.category_name.errors %}
+              <li>{{ error }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+            
+        </form>
+    </div>
+
+
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class=flashes>
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}" role="alert">
+          {{ message }}
+      </div>
+    {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+
+  <hr>
+
+
+
+
+
+  <div class="row">
+    <div class="col">
+      {% for container in containers %}
+        {{container.name}}
+      {% endfor %}
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
