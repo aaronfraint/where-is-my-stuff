@@ -1,12 +1,7 @@
 """Logged-in page routes."""
 from flask import Blueprint, render_template, redirect, url_for, request, session, flash
 from flask_login import current_user, login_required, logout_user
-# from .models import Space, db, User, ContainerCategory, Container, ContainerCategory
 
-from my_stuff.models.container import Container, ContainerCategory
-from my_stuff.models.space import Space
-from my_stuff.models.user import User
-from my_stuff import db
 
 from my_stuff.forms.forms import SpaceForm, CategoryForm, ContainerForm
 from my_stuff.forms.single_space_page_form import AddContainerForm

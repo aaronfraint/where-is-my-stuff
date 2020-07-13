@@ -2,10 +2,15 @@
 from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import current_user, login_required
 
-from my_stuff.models.container import Container, ContainerCategory
-from my_stuff.models.space import Space
-from my_stuff.models.user import User
 from my_stuff import db
+from my_stuff.models.all_models import (
+    User,
+    Space,
+    Container,
+    ContainerCategory,
+    Item,
+    Tag
+)
 
 from my_stuff.forms.all_spaces_page_form import AddSpaceForm
 from my_stuff.forms.single_space_page_form import AddContainerForm
@@ -43,17 +48,7 @@ def save_space():
     if form.validate_on_submit():
 
         space_name = form.space_name.data.lstrip().rstrip()
-        space_desc = form.description.data
-
-        # Make sure it's not empty text
-        if len(space_name.replace(" ", "")) == 0:
-            flash(f"Space name can't only be spaces", "danger")
-            return redirect(url_for('spaces_bp.spaces'))
-
-        # Same for the description
-        if len(space_desc.replace(" ", "")) == 0:
-            flash(f"Please add a description for your space", "danger")
-            return redirect(url_for('spaces_bp.spaces'))
+        space_desc = form.description.data.lstrip().rstrip()
 
         user = User.query.filter_by(username=current_user.username).first()
         space = Space.query.filter_by(

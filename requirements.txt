@@ -6,3 +6,4 @@ flask-wtf
 flake8
 python-dotenv
 email_validator
+pytz

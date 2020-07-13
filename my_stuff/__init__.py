@@ -8,6 +8,7 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 
 
+
 def create_app():
     """Construct the core app object."""
     app = Flask(__name__, instance_relative_config=False)

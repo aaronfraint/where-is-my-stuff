@@ -6,7 +6,7 @@ from flask_login import login_required, logout_user, current_user, login_user
 from my_stuff.forms.forms import LoginForm, SignupForm
 
 
-from my_stuff.models.user import db, User
+from my_stuff.models.all_models import db, User
 
 from . import login_manager
 
