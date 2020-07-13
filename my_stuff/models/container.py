@@ -4,6 +4,9 @@ from my_stuff import db
 class ContainerCategory(db.Model):
 
     __tablename__ = 'container_categories'
+    __table_args__ = (
+        db.UniqueConstraint('name', 'space_id'),
+    )
 
     uid = db.Column(
         db.Integer,
@@ -14,13 +17,19 @@ class ContainerCategory(db.Model):
         nullable=False,
         unique=False
     )
-    space_id = db.Column(db.Integer, db.ForeignKey("spaces.uid"), nullable=False)
-
+    space_id = db.Column(
+        db.Integer,
+        db.ForeignKey("spaces.uid"),
+        nullable=False
+    )
 
 
 class Container(db.Model):
 
     __tablename__ = 'containers'
+    __table_args__ = (
+        db.UniqueConstraint('name', 'space_id'),
+    )
 
     uid = db.Column(
         db.Integer,
