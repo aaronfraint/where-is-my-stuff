@@ -20,13 +20,16 @@ def create_app():
     login_manager.init_app(app)
 
     with app.app_context():
-        from my_stuff.routes import routes
-        from . import auth
-        # from .assets import compile_assets
 
         # Register Blueprints
-        app.register_blueprint(routes.main_bp)
+        from . import auth
         app.register_blueprint(auth.auth_bp)
+
+        from my_stuff.routes import routes
+        app.register_blueprint(routes.main_bp)
+
+        from my_stuff.routes import spaces
+        app.register_blueprint(spaces.spaces_bp)
 
         # Create Database Models
         db.create_all()

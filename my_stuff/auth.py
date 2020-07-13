@@ -29,7 +29,7 @@ def login():
     """
     # Bypass if user is logged in
     if current_user.is_authenticated:
-        return redirect(url_for('main_bp.spaces'))  
+        return redirect(url_for('spaces_bp.spaces'))  
 
     login_form = LoginForm()
     signup_form = SignupForm()
@@ -40,15 +40,12 @@ def login():
 
             # Validate login attempt
             if login_form.validate_on_submit() and login_form.email.data:
-                user = User.query.filter_by(email=login_form.email.data).first()  
+                user = User.query.filter_by(email=login_form.email.data).first()
                 if user and user.check_password(password=login_form.password.data):
                     login_user(user)
-                    next_page = request.args.get('next')
-                    return redirect(next_page or url_for('main_bp.spaces'))
+                    return redirect(url_for('spaces_bp.spaces'))
 
-                flash(r'Invalid username/password combination')
-
-                return redirect(url_for('auth_bp.spaces'))
+                flash(r'Invalid username/password combination', "danger")
 
         if request.form['submit'] == 'signup':
 
@@ -63,8 +60,9 @@ def login():
                     db.session.add(user)
                     db.session.commit()  # Create new user
                     login_user(user)  # Log in as newly created user
-                    return redirect(url_for('main_bp.spaces'))
-                flash('A user already exists with that email address.')
+                    return redirect(url_for('spaces_bp.spaces'))
+
+                flash('A user already exists with that email address.', "danger")
 
     return render_template(
         'get_started.html',
