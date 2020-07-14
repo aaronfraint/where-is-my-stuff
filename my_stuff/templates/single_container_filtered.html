@@ -1,0 +1,92 @@
+{% extends "navbar_logged_in.html" %}
+
+{% block toprow %}
+<div class="row">
+  <!-- Space ... Color gradient, rounded corners -->
+  <div class="col p-5 rounded" style="{{make_random_gradient()}}">
+    <h1>{{ container.name }}: <code>#{{ selected_tag.slug()}}</code></h1>
+      <a class="btn btn-sm btn-secondary mb-1" href="/container/{{ container.uid }}" role="button">Return to {{ container.name }}</a>
+    <h5></h5>
+
+    <p>Tags:</p>
+
+    {% for tag in container.tags() %}
+      {% if tag.name == tag_txt %}
+      <a class="btn btn-primary mb-1" href="#" role="button">#{{ tag.slug() }}</a>
+      {% else %}
+        <a class="btn btn-sm btn-light mb-1" href="/container/{{ container.uid }}/tag/{{ tag.slug() }}" role="button">#{{ tag.slug() }}</a>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+
+
+
+
+{% endblock %}
+
+
+{% block content %}
+
+<!-- Item table -->
+
+<div class="row mt-3">
+  <div class="col">
+    <h5> {{ stats["tagged_items"]}} tagged <code>#{{ selected_tag.slug() }}</code> in {{ container.name }}</h5>
+    <table class="table">
+      <tbody>
+        {% for item in tagged_items %}
+        <tr>
+          <td style="width: 30%">
+            {{item.name}}
+            <small class="text-muted">{{ item.fancy_units_with_qty() }}</small>
+          </td>
+          <td>
+            {% for tag in item.tags %}
+            {% if tag.name == tag_txt %}
+            <a class="btn btn-sm btn-primary mb-1" href="#" role="button">#{{ tag.slug() }}</a>
+            {% else %}
+              <a class="btn btn-sm btn-light mb-1" href="/container/{{ container.uid }}/tag/{{ tag.slug() }}" role="button">#{{ tag.slug() }}</a>
+            {% endif %}
+                  {% endfor %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+
+
+<div class="row mt-3">
+  <div class="col">
+    <h5>{{ stats["untagged_items"]}} not tagged with <code>#{{ selected_tag.slug() }}</code> in {{ container.name }}</h5>
+    <table class="table">
+      <tbody>
+        {% for item in untagged_items %}
+        <tr>
+          <td style="width: 30%">
+            {{item.name}}
+            <small class="text-muted">{{ item.fancy_units_with_qty() }}</small>
+
+          </td>
+          <td>
+            {% for tag in item.tags %}
+            <a class="btn btn-sm btn-light mb-1" href="/container/{{ container.uid }}/tag/{{ tag.slug() }}" role="button">#{{ tag.slug() }}</a>
+            {% endfor %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+
+
+
+{% endblock %}

@@ -16,11 +16,9 @@
 
     <div class="container">
       <!-- Top row -->
-      <div class="row">
-          {% block topleft %}{% endblock %}
-          {% block topright %}{% endblock %}
-      </div>
-      <hr>
+      {% block toprow %}{% endblock %}
+
+      <!-- Content row -->
       {% block content %}{% endblock %}
     </div>
 

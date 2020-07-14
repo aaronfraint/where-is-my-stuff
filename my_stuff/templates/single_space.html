@@ -1,60 +1,78 @@
 {% extends "navbar_logged_in.html" %}
 
-{% block topleft %}
-  <!-- Space name and stats... Color gradient, rounded corners -->
 
-  <div class="col-md p-5 rounded" style="{{space.card_background()}}">
+{% block toprow %}
+  <div class="row">
+    <!-- Space name and stats... Color gradient, rounded corners -->
+    <div class="col-md p-5 rounded" style="{{ make_random_gradient() }}">
+      <h1>{{ space.name }}</h1>
+      <ul>
+        <li>
+          {{space.description}}
+        </li>
+        <li>
+          {{ space.share_txt() }}
+        </li>
+      </ul>
+      <div class="font-italic">
+        <p></p>
+      </div>
+  
+      <p> Filter containers in this space by category:</p>
+        {% for category in space.container_categories %}
+        <button type="button" class="btn btn-sm btn-secondary mb-4">
+          {{ category.name }}
+        </button>
+      {% endfor %}
 
-    <h1>{{ space.name }}</h1>
+      {% if all_item_tags %}
+        <p> Filter items in this space by tag:</p>
+        {% for tag in all_item_tags %}
+        <a class="btn btn-sm btn-light mb-1" href="/space/{{ space.uid }}/tag/{{ tag.slug() }}" role="button">#{{ tag.slug() }}</a>
+        {% endfor %}
+      {% endif %}
 
-    <div class="font-italic">
-      <p>{{space.description}}</p>
+    </div>
+    <div class="col-md">
+      <h3>Add a Container</h3>
+      <form method="POST" action="{{ request.path }}/add/container">
+          {{ form.csrf_token }}
+  
+          <!-- Input for container name -->
+          <p>Name:</p>
+          <input type="name" class="form-control" id="container_name" name="container_name" placeholder="e.g. B1 or Refridgerator or Backpack">
+  
+  
+          <hr>
+          <!-- Input for a NEW category name -->
+          <p>Add a category:</p>
+  
+          <input type="name" class="form-control" id="new_category" name="new_category" placeholder="e.g. small box">
+  
+          <!-- Input to select an EXISTING category name -->
+          <select class="form-control" id="existing_category" name="existing_category">
+            <option disabled selected value>... or select an existing category</option>
+            {% for category in space.container_categories %}
+            <option>{{ category.name }}</option>
+            {% endfor %}
+          </select>
+  
+          <hr>
+          <center>
+            <button type="submit" class="btn btn-primary">Add Container</button>
+          </center>
+         
+          </form>
     </div>
 
-    <p>Click on a category to filter:</p>
-
-    {% for category in space.container_categories %}
-      <button type="button" class="btn btn-outline-primary mb-1">
-        {{ category.name }}
-      </button>
-    {% endfor %}
-
   </div>
-{% endblock %}
 
 
-{% block topright %}
+
+
   <!-- Form to add new containers -->
   <div class="col-md">
-    <h3>Add a Container</h3>
-    <form method="POST" action="{{ request.path }}/add/container">
-        {{ form.csrf_token }}
 
-        <!-- Input for container name -->
-        <p>Name:</p>
-        <input type="name" class="form-control" id="container_name" name="container_name" placeholder="e.g. B1 or Refridgerator or Backpack">
-
-
-        <hr>
-        <!-- Input for a NEW category name -->
-        <p>Add a category:</p>
-
-        <input type="name" class="form-control" id="new_category" name="new_category" placeholder="e.g. small box">
-
-        <!-- Input to select an EXISTING category name -->
-        <select class="form-control" id="existing_category" name="existing_category">
-          <option disabled selected value>... or select an existing category</option>
-          {% for category in space.container_categories %}
-          <option>{{ category.name }}</option>
-          {% endfor %}
-        </select>
-
-        <hr>
-        <center>
-          <button type="submit" class="btn btn-primary">Add Container</button>
-        </center>
-       
-        </form>
   </div>
 
 {% endblock %}
@@ -63,7 +81,7 @@
 {% block content %}
 
 <!-- Flashed messages -->
-<div class="row">
+<div class="row mt-4">
   <div class="col">
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
@@ -83,46 +101,47 @@
 </div>
 
 <!-- Container section -->
-<div class="row">
+<div class="row mt-4">
   <div class="col">
-
     <table class="table">
       <thead>
         <tr>
-          <th scope="col">qty</th>
-          <th scope="col">units</th>
-          <th scope="col">thing</th>
-          <th scope="col">tags</th>
+          <th></th>
+          <th scope="col">Container</th>
+          <th scope="col">Category</th>
+          <th scope="col">Items</th>
+          <th scope="col">Tags</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <th scope="row">1</th>
-          <td>Mark</td>
-          <td>Otto</td>
-          <td>@mdo</td>
-        </tr>
-        <tr>
-          <th scope="row">2</th>
-          <td>Jacob</td>
-          <td>Thornton</td>
-          <td>@fat</td>
-        </tr>
-        <tr>
-          <th scope="row">3</th>
-          <td>Larry</td>
-          <td>the Bird</td>
-          <td>@twitter</td>
-        </tr>
+        {% for container in containers %}
+          <tr>
+            <td>
+              <a class="btn btn-sm btn-outline-primary " href="/container/{{ container.uid }}" role="button">Open</a>
+            </td>
+            <td>
+              {{ container.name }} 
+            </td>
+            <td>
+              <a class="btn btn-sm btn-secondary mb-1" href="#" role="button">{{ container.category_txt() }}</a>
+
+              
+            </td>
+            <td>{{ container.num_items() }}</td>
+            <td>
+              {% for tag in container.tags() %}
+              <a class="btn btn-sm btn-light mb-1" href="/container/{{ container.uid }}/tag/{{ tag.slug() }}" role="button">#{{ tag.slug() }}</a>
+              {% endfor %}
+            </td>
+          </tr>
+        {% endfor %}
       </tbody>
     </table>
 
-
-    {% for container in containers %}
-      {{container.name}}
-    {% endfor %}
-
   </div>
 </div>
+
+
+
 
 {% endblock %}

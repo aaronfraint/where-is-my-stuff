@@ -1,0 +1,132 @@
+{% extends "navbar_logged_in.html" %}
+
+{% block toprow %}
+<div class="row">
+  <!-- Space ... Color gradient, rounded corners -->
+  <div class="col-sm p-5 rounded" style="{{make_random_gradient()}}">
+    <h1>Container: {{ container.name }}</h1>
+    <a href="/space/{{space.uid}}">
+      <button type="button" class="btn btn-secondary btn-sm">Return to {{space.name}}</button>
+    </a>
+    <h5></h5>
+
+    <p>Tags:</p>
+
+    {% for tag in container.tags() %}
+    <a class="btn btn-sm btn-light mb-1" href="/container/{{ container.uid }}/tag/{{ tag.slug() }}" role="button">#{{ tag.slug() }}</a>
+    {% endfor %}
+  </div>
+
+  <!-- FORM!!! -->
+  <div class="col">
+    <form method="POST" action="{{ request.path }}/add/item">
+      {{ form.csrf_token }}
+      <div class="form-row">
+        <div class="form-group col-md-5">
+          <h5>Add an Item</h5>
+          <label for="item_name">Item</label>
+          <input type="text" class="form-control" id="item_name" name="item_name" placeholder="e.g. Dishes">
+          <hr>
+          <label for="qty">Qty.</label>
+          <input type="text" class="form-control" id="qty" name="qty" value="1">
+          <hr>
+          <label for="units">Units</label>
+          <select id="units" class="form-control" name="units">
+            <option selected>count</option>
+            <option>pounds</option>
+            <option>gallons</option>
+            <option>ounces</option>
+            <option>kilograms</option>
+        </select>
+        <hr>
+        <label for="new_tags">Add new tags</label>
+        <input type="text" class="form-control" id="new_tags" name="new_tags" placeholder="e.g. electric, tool">
+
+
+      </div>
+        <div class="form-group col-md-1">
+        </div>
+
+        <div class="form-group col-md-6">
+          <h5> </h5>
+          <label for="existing_tags">Select existing tag(s)</label>
+          <select multiple class="form-control" id="existing_tags" name="existing_tags" size="{{ num_tags }}" >
+            {% for tag in container.tags() %}
+            <option>{{tag.name}}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <center>
+        <button type="submit" class="btn btn-primary">Add Item</button>
+      </center>
+    </form>
+  </div>
+
+
+</div>
+
+{% endblock %}
+
+
+{% block content %}
+
+<!-- Flashed messages -->
+<div class="row mt-4">
+  <div class="col">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class=flashes>
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+      {% endfor %}
+      </div>
+    {% endif %}
+    {% endwith %}
+  </div>
+</div>
+
+<!-- Item table -->
+
+<div class="row mt-3">
+  <div class="col">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">item</th>
+          <th scope="col">tags</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr>
+          <td>
+            {{item.name}}
+            <small class="text-muted">{{ item.fancy_units_with_qty() }}</small>
+
+          </td>
+          <td>
+            {% for tag in item.tags %}
+            <a class="btn btn-sm btn-light mb-1" href="/container/{{ container.uid }}/tag/{{ tag.slug() }}" role="button">#{{ tag.slug() }}</a>
+            {% endfor %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+
+
+
+
+
+
+{% endblock %}

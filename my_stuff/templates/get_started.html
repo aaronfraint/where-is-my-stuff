@@ -18,7 +18,7 @@
   <div class="row">
 
 
-      <div class="col card mr-2 p-2">
+      <div class="col border-white card mr-2 p-2" style="background: linear-gradient(to bottom right, #33ccff 0%, #ff99cc 100%);">
         <h1>Log In</h1>
         <form method="POST" action="/getstarted">
           {{ login_form.csrf_token }}
@@ -44,23 +44,25 @@
                 </ul>
               {% endif %}
           </div>
-          <button type="submit" name="submit" value="login" class="btn btn-primary">Log In</button>
+          <center>
+            <button type="submit" name="submit" value="login" class="btn btn-primary">Log In</button>
+          </center>
         </form>
       </div>
 
 
-      <div class="col card mr-2 p-2 ">
+      <div class="col card bg-light mr-2 p-2 ">
         <h1>Sign Up</h1>
 
         <form method="POST" action="/getstarted">
           {{ signup_form.csrf_token }}
 
           <div class="form-group">
-            <label for="username">{{ signup_form.username.label }}</label>
-            <input type="text" class="form-control" id="username" name="username" placeholder="e.g. Rocky Balboa">
-              {% if signup_form.username.errors %}
+            <label for="name">{{ signup_form.name.label }}</label>
+            <input type="text" class="form-control" id="name" name="name" placeholder="e.g. Rocky Balboa">
+              {% if signup_form.name.errors %}
                 <ul class="errors">
-                  {% for error in signup_form.username.errors %}
+                  {% for error in signup_form.name.errors %}
                     <li>{{ error }}</li>{% endfor %}
                 </ul>
               {% endif %}
@@ -102,7 +104,9 @@
 
 
 
-          <button type="submit" name="submit" value="signup" class="btn btn-outline-primary">Sign Up</button>
+          <center>
+            <button type="submit" name="submit" value="signup" class="btn btn-outline-primary">Sign Up</button>
+          </center>
         </form>
       </div>      
 

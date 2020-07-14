@@ -53,7 +53,7 @@ def login():
                 existing_user = User.query.filter_by(email=signup_form.email.data).first()
                 if existing_user is None:
                     user = User(
-                        username=signup_form.username.data,
+                        name=signup_form.name.data,
                         email=signup_form.email.data
                     )
                     user.set_password(signup_form.password.data)

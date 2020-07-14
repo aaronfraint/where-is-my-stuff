@@ -7,7 +7,7 @@
 
   <div class="row mt-4">
     <div class="col">
-      <h1>{{ current_user.username.upper() }}</h1>
+      <h1>{{ current_user.name }}'s Spaces</h1>
       <ul>
         <li>{{ current_user.num_spaces() }} spaces</li>
         <li>{{ current_user.num_spaces() }} containers</li>
@@ -22,20 +22,13 @@
       <form method="POST" action="/save/space">
 
         {{ form.csrf_token }}
-        
-        {% for message in get_flashed_messages() %}
-          <div class="alert alert-warning">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-            {{ message }}
-          </div>
-        {% endfor %}
 
         <div class="form-group">
-          <label for="name">{{ form.name.label }}</label>
-          <input type="name" class="form-control" id="name" name="name" placeholder="e.g. Kitchen">
-            {% if form.name.errors %}
+          <label for="space_name">{{ form.space_name.label }}</label>
+          <input type="name" class="form-control" id="space_name" name="space_name" placeholder="e.g. Kitchen">
+            {% if form.space_name.errors %}
               <ul class="errors">
-                {% for error in form.name.errors %}
+                {% for error in form.space_name.errors %}
                   <li>{{ error }}</li>{% endfor %}
               </ul>
             {% endif %}
@@ -50,19 +43,38 @@
               </ul>
             {% endif %}
         </div>
-        <button type="submit" class="btn btn-primary">Add</button>
+        <center>
+          <button type="submit" class="btn btn-primary">Add Space</button>
+        </center>
       </form>
+
     </div>
   </div>
 
   <hr/>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  {% for category, message in messages %}
+  <div class="row flashes">
+      <div class="col alert alert-{{ category }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+      </div>
+    </div>
+  {% endfor %}
+  {% endif %}
+  {% endwith %}
+
 
   <div class="row mt-3 row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-2">
 
   {% for space in spaces %}
 
           <div class="col mb-4">
-          <div class="card border-white" style="{{space.card_background()}}">
+          <div class="card border-white" style="{{ make_random_gradient()}}">
               <div class="card-body ">
                 <h5 class="card-title">{{space.name}}</h5>
                 <p class="card-text">{{space.description}}</p>

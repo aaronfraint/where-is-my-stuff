@@ -2,7 +2,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import current_user, login_required
 
-from my_stuff import db
+from my_stuff import db, make_random_gradient
 from my_stuff.models.all_models import (
     User,
     Space,
@@ -28,13 +28,14 @@ spaces_bp = Blueprint(
 @login_required
 def spaces():
     """Logged-in User landing page"""
-    user = User.query.filter_by(username=current_user.username).first()
+    user = User.query.filter_by(name=current_user.name).first()
     spaces = Space.query.filter_by(user_id=user.id).all()
 
     return render_template(
         'spaces.html',
         spaces=spaces,
         form=AddSpaceForm(),
+        make_random_gradient=make_random_gradient
     )
 
 
@@ -88,7 +89,19 @@ def space_by_id(space_id):
     """
     space = Space.query.filter_by(uid=space_id).first()
 
-    containers = Container.query.filter_by(space_id=space_id).all()
+    containers = Container.query.filter_by(
+        space_id=space_id
+    ).order_by(Container.name).all()
+
+    all_item_tags = []
+
+    for container in containers:
+        for tag in container.tags():
+            if tag not in all_item_tags:
+                all_item_tags.append(tag)
+
+    if len(all_item_tags) == 0:
+        all_item_tags = None
 
     form = AddContainerForm()
 
@@ -97,6 +110,8 @@ def space_by_id(space_id):
         space=space,
         form=form,
         containers=containers,
+        make_random_gradient=make_random_gradient,
+        all_item_tags=all_item_tags
     )
 
 

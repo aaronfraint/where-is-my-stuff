@@ -5,7 +5,7 @@ from random import randrange
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from my_stuff import db
+from my_stuff import db, make_random_gradient
 
 
 tag_helper = db.Table(
@@ -44,6 +44,15 @@ class Tag(db.Model):
         db.ForeignKey("flasklogin_users.id"),
         nullable=False
     )
+    background = db.Column(
+        db.Text,
+        nullable=False,
+        unique=False,
+        default=make_random_gradient()
+    )
+
+    def slug(self):
+        return self.name.replace(" ", "-")
 
 
 class Item(db.Model):
@@ -83,6 +92,25 @@ class Item(db.Model):
         backref=db.backref('pages', lazy=True)
     )
 
+    def fancy_units_with_qty(self):
+        qty = self.qty
+        units = self.units
+
+        qty_as_text = str(qty)
+        qty_parts = qty_as_text.split(".")
+
+        if qty_parts[1] == "0":
+            fancy_qty = qty_parts[0]
+        else:
+            fancy_qty = qty_as_text
+
+        if qty == 1 and units == "count":
+            return ""
+        elif units == "count":
+            return f"- {fancy_qty}"
+        else:
+            return f"- {fancy_qty} {units}"
+
 
 class User(UserMixin, db.Model):
     """User account model."""
@@ -93,7 +121,7 @@ class User(UserMixin, db.Model):
         db.Integer,
         primary_key=True
     )
-    username = db.Column(
+    name = db.Column(
         db.String(100),
         nullable=False,
         unique=True
@@ -128,6 +156,12 @@ class User(UserMixin, db.Model):
         unique=False,
         nullable=True
     )
+    background = db.Column(
+        db.Text,
+        nullable=False,
+        unique=False,
+        default=make_random_gradient()
+    )
 
     spaces = db.relationship("Space", backref=__tablename__, lazy=True)
     tags = db.relationship("Tag", backref=__tablename__, lazy=True)
@@ -152,9 +186,6 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
-
-    def __init__(self):
-        self.track_login()
 
 
 class ContainerCategory(db.Model):
@@ -196,9 +227,33 @@ class Container(db.Model):
         nullable=False,
         unique=False
     )
+    background = db.Column(
+        db.Text,
+        nullable=False,
+        unique=False,
+        default=make_random_gradient()
+    )
+
     space_id = db.Column(db.Integer, db.ForeignKey("spaces.uid"), nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey("container_categories.uid"), nullable=False)
+    items = db.relationship("Item", backref=__tablename__, lazy=True)
 
+    def tags(self):
+        all_tags_in_container = []
+        for item in self.items:
+            for tag in item.tags:
+                if tag not in all_tags_in_container:
+                    all_tags_in_container.append(tag)
+        return sorted(all_tags_in_container, key=lambda t: t.name.lower())
+
+    def num_items(self):
+        return len(self.items)
+
+    def category_txt(self):
+        category = ContainerCategory.query.filter_by(
+            uid=self.category_id
+        ).first()
+        return category.name
 
 
 class Space(db.Model):
@@ -239,46 +294,15 @@ class Space(db.Model):
         backref=__tablename__,
         lazy=True
     )
+    background = db.Column(
+        db.Text,
+        nullable=False,
+        unique=False,
+        default=make_random_gradient()
+    )
 
-    def card_background(self, style: str = "random") -> str:
-
-        def _make_random_rgba():
-            v1 = randrange(255)
-            v2 = randrange(255)
-            v3 = randrange(255)
-
-            return f"rgba({v1},{v2},{v3},X)"
-
-        def _gradient(color: str) -> str:
-            color1 = color.replace("X", "0.8")
-            color2 = color.replace("X", "0")
-            return f"{color1}, {color2}"
-
-        # TODO: have style reflect shared vs. private status
+    def share_txt(self):
         if self.share_status == "private":
-            pass
-        elif self.share_status == "shared":
-            pass
-
-        # For now, just use random colors
-        if style == "default":
-            color1 = "rgba(255,0,0,X)"
-            color2 = "rgba(0,255,0,X)"
-            color3 = "rgba(0,0,255,X)"
-
-        elif style == "random":
-            color1 = _make_random_rgba()
-            color2 = _make_random_rgba()
-            color3 = _make_random_rgba()
-
-        rot1 = randrange(360)
-        rot2 = randrange(360)
-        rot3 = randrange(360)
-
-        text = f"""
-            background: linear-gradient({rot1}deg, {_gradient(color1)} 70.71%),
-                        linear-gradient({rot2}deg, {_gradient(color2)} 70.71%),
-                        linear-gradient({rot3}deg, {_gradient(color3)} 70.71%);
-        """
-
-        return text
+            return "Private - not shared with others"
+        else:
+            return "TODO!!! Report number of people that have access to the space"

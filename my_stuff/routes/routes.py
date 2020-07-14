@@ -1,10 +1,7 @@
 """Logged-in page routes."""
-from flask import Blueprint, render_template, redirect, url_for, request, session, flash
-from flask_login import current_user, login_required, logout_user
+from flask import Blueprint, render_template, redirect, url_for
+from flask_login import login_required, logout_user
 
-
-from my_stuff.forms.forms import SpaceForm, CategoryForm, ContainerForm
-from my_stuff.forms.single_space_page_form import AddContainerForm
 
 # Blueprint Configuration
 main_bp = Blueprint(
@@ -12,7 +9,6 @@ main_bp = Blueprint(
     template_folder='templates',
     static_folder='static'
 )
-
 
 
 @main_bp.route('/', methods=['GET'])
@@ -29,5 +25,3 @@ def logout():
     """User log-out logic."""
     logout_user()
     return redirect(url_for('auth_bp.login'))
-
-
