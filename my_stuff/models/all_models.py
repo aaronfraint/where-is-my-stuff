@@ -1,3 +1,4 @@
+from flask_login import current_user
 from datetime import datetime
 from pytz import timezone
 from random import randrange
@@ -22,6 +23,20 @@ tag_helper = db.Table(
         primary_key=True)
 )
 
+
+space_helper = db.Table(
+    'space_helper',
+    db.Column(
+        'space_id',
+        db.Integer,
+        db.ForeignKey('spaces.uid'),
+        primary_key=True),
+    db.Column(
+        'user_id',
+        db.Integer,
+        db.ForeignKey('flasklogin_users.id'),
+        primary_key=True)
+)
 
 class Tag(db.Model):
 
@@ -163,8 +178,15 @@ class User(UserMixin, db.Model):
         default=make_random_gradient()
     )
 
-    spaces = db.relationship("Space", backref=__tablename__, lazy=True)
+    # spaces = db.relationship("Space", backref=__tablename__, lazy=True)
     tags = db.relationship("Tag", backref=__tablename__, lazy=True)
+
+    spaces = db.relationship(
+        'Space',
+        secondary=space_helper,
+        lazy='subquery',
+        backref=db.backref('spaces', lazy=True)
+    )
 
     def num_spaces(self):
         return len(self.spaces)
@@ -259,9 +281,9 @@ class Container(db.Model):
 class Space(db.Model):
 
     __tablename__ = 'spaces'
-    __table_args__ = (
-        db.UniqueConstraint('name', 'user_id'),
-    )
+    # __table_args__ = (
+    #     db.UniqueConstraint('name', 'user_id'),
+    # )
 
     uid = db.Column(
         db.Integer,
@@ -277,17 +299,25 @@ class Space(db.Model):
         unique=False,
         nullable=False
     )
-    share_status = db.Column(
-        db.String(10),
-        unique=False,
-        nullable=False,
-        default="private"
+    # share_status = db.Column(
+    #     db.String(10),
+    #     unique=False,
+    #     nullable=False,
+    #     default="private"
+    # )
+    # user_id = db.Column(
+    #     db.Integer,
+    #     db.ForeignKey("flasklogin_users.id"),
+    #     nullable=False
+    # )
+
+    users = db.relationship(
+        'User',
+        secondary=space_helper,
+        lazy='subquery',
+        backref=db.backref('flasklogin_users', lazy=True)
     )
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey("flasklogin_users.id"),
-        nullable=False
-    )
+
 
     container_categories = db.relationship(
         "ContainerCategory",
@@ -302,7 +332,8 @@ class Space(db.Model):
     )
 
     def share_txt(self):
-        if self.share_status == "private":
+        if len(self.users) == 1:
             return "Private - not shared with others"
         else:
-            return "TODO!!! Report number of people that have access to the space"
+            other_users = [user.email for user in self.users if user != current_user]
+            return "Shared with: " + ", ".join(other_users)

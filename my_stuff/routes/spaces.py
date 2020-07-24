@@ -14,6 +14,7 @@ from my_stuff.models.all_models import (
 
 from my_stuff.forms.all_spaces_page_form import AddSpaceForm
 from my_stuff.forms.single_space_page_form import AddContainerForm
+from my_stuff.forms.invite_user_to_space import InviteForm
 
 
 # Blueprint Configuration
@@ -28,8 +29,9 @@ spaces_bp = Blueprint(
 @login_required
 def spaces():
     """Logged-in User landing page"""
-    user = User.query.filter_by(name=current_user.name).first()
-    spaces = Space.query.filter_by(user_id=user.id).all()
+    # user = User.query.filter_by(name=current_user.name).first()
+    spaces = Space.query.join(Space.users).filter_by(id=current_user.id).all()
+    # filter_by(user=current_user).all()
 
     return render_template(
         'spaces.html',
@@ -51,11 +53,15 @@ def save_space():
         space_name = form.space_name.data.lstrip().rstrip()
         space_desc = form.description.data.lstrip().rstrip()
 
-        user = User.query.filter_by(username=current_user.username).first()
+        # user = User.query.filter_by(name=current_user.name).first()
+        # space = Space.query.filter_by(
+        #     user_id=user.id,
+        #     name=space_name,
+        # ).first()
+
         space = Space.query.filter_by(
-            user_id=user.id,
-            name=space_name,
-        ).first()
+            name=space_name
+        ).join(Space.users).filter_by(id=current_user.id).first()
 
         if space:
             flash(f"Space '{space.name}' already exists. Use a different name.", "danger")
@@ -64,7 +70,7 @@ def save_space():
             space = Space(
                 name=space_name,
                 description=space_desc,
-                user_id=user.id
+                users=[current_user]
             )
 
             db.session.add(space)
@@ -111,7 +117,8 @@ def space_by_id(space_id):
         form=form,
         containers=containers,
         make_random_gradient=make_random_gradient,
-        all_item_tags=all_item_tags
+        all_item_tags=all_item_tags,
+        invite_form=InviteForm()
     )
 
 
@@ -188,6 +195,34 @@ def add_container_to_space(space_id):
         for error in form.new_category.errors:
             flash(error, "danger")
         for error in form.existing_category.errors:
+            flash(error, "danger")
+
+    return redirect(url_for('spaces_bp.space_by_id', space_id=space_id))
+    
+
+
+
+@spaces_bp.route('/space/<space_id>/invite', methods=['POST'])
+@login_required
+def invite_user_to_space(space_id):
+    form = InviteForm()
+
+    if form.validate_on_submit():
+        space = Space.query.filter_by(uid=space_id).first()
+
+        new_user = User.query.filter_by(email=form.invite_email.data).first()
+
+        if not new_user:
+            flash("This user does not exist", "danger")
+            return redirect(url_for('spaces_bp.space_by_id', space_id=space_id))
+
+        else:
+            space.users.append(new_user)
+            db.session.commit()
+            flash(f"Invited: {form.invite_email.data}", "success")
+
+    else:
+        for error in form.invite_email.errors:
             flash(error, "danger")
 
     return redirect(url_for('spaces_bp.space_by_id', space_id=space_id))

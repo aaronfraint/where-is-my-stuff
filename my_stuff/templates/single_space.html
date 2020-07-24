@@ -32,6 +32,21 @@
         {% endfor %}
       {% endif %}
 
+        <h5 class="mt-2">
+          Invite another user to this space:
+        </h5>
+        <form method="POST" action="{{ request.path }}/invite">
+          {{ invite_form.csrf_token }}
+          <div class="input-group mb-3">
+            <input type="email" class="form-control rounded" id="invite_email" name="invite_email" placeholder="email@address.com" style="width: 50%;">
+            <div class="input-group-append">
+              <button type="submit" class="btn btn-outline-primary ml-2 rounded">Invite</button>
+            </div>
+          </div>
+
+        </form>
+
+ 
     </div>
     <div class="col-md">
       <h3>Add a Container</h3>
