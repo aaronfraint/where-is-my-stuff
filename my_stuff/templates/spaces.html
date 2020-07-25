@@ -70,8 +70,11 @@
 
 
   <div class="row mt-3 row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-2">
+    <h1>
+      Shared Spaces
+    </h1>
 
-  {% for space in spaces %}
+  {% for space in shared_spaces %}
 
           <div class="col mb-4">
           <div class="card border-white" style="{{ make_random_gradient()}}">
@@ -88,5 +91,30 @@
     </div>
 
 </div>
+<hr>
+<div class="row mt-3 row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-2">
+  <h1>
+    Private Spaces
+  </h1>
+
+{% for space in private_spaces %}
+
+        <div class="col mb-4">
+        <div class="card border-white" style="{{ make_random_gradient()}}">
+            <div class="card-body ">
+              <h5 class="card-title">{{space.name}}</h5>
+              <p class="card-text">{{space.description}}</p>
+              <a href="/space/{{space.uid}}">
+                <button type="button" class="btn btn-light btn-sm" >Open</button>
+              </a>
+            </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+</div>
+
+
 
 {% endblock %}

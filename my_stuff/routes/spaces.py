@@ -15,6 +15,7 @@ from my_stuff.models.all_models import (
 from my_stuff.forms.all_spaces_page_form import AddSpaceForm
 from my_stuff.forms.single_space_page_form import AddContainerForm
 from my_stuff.forms.invite_user_to_space import InviteForm
+from my_stuff.forms.search_form import SearchForm
 
 
 # Blueprint Configuration
@@ -29,15 +30,24 @@ spaces_bp = Blueprint(
 @login_required
 def spaces():
     """Logged-in User landing page"""
-    # user = User.query.filter_by(name=current_user.name).first()
     spaces = Space.query.join(Space.users).filter_by(id=current_user.id).all()
-    # filter_by(user=current_user).all()
+
+    private_spaces = []
+    shared_spaces = []
+
+    for space in spaces:
+        if space.num_users() == 1:
+            private_spaces.append(space)
+        else:
+            shared_spaces.append(space)
 
     return render_template(
         'spaces.html',
-        spaces=spaces,
+        private_spaces=private_spaces,
+        shared_spaces=shared_spaces,
         form=AddSpaceForm(),
-        make_random_gradient=make_random_gradient
+        make_random_gradient=make_random_gradient,
+        search_form=SearchForm()
     )
 
 
@@ -118,7 +128,8 @@ def space_by_id(space_id):
         containers=containers,
         make_random_gradient=make_random_gradient,
         all_item_tags=all_item_tags,
-        invite_form=InviteForm()
+        invite_form=InviteForm(),
+        search_form=SearchForm(),
     )
 
 

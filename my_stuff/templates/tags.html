@@ -1,0 +1,71 @@
+{% extends "navbar_logged_in.html" %}
+
+{% block toprow %}
+<div class="row">
+  <!-- Space ... Color gradient, rounded corners -->
+  <div class="col p-5 rounded" style="{{make_random_gradient()}}">
+    <h1>
+      Items tagged: 
+      <a class="btn btn-lg btn-primary" href="/tagged/{{tag_slug}}" role="button" style="height: 150%">#{{tag_slug}}</a>
+      </h1>
+
+  </div>
+</div>
+
+
+
+
+
+{% endblock %}
+
+
+{% block content %}
+
+<!-- Item table -->
+<div class="row mt-4">
+  <div class="col-xl">
+    <table class="table table-sm">
+      <thead>
+        <tr>
+          <th scope="col">Item</th>
+          <th scope="col">Container</th>
+          <th scope="col">Space</th>
+          <th scope="col">Tags</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s, c, i in selected_items %}
+        <tr>
+          <th scope="row">{{i.name}}</th>
+          <td>
+            <a href="/container/{{c.uid}}">
+              {{c.name}}
+            </a>
+          </td>
+          <td>
+            <a href="/space/{{s.uid}}">
+            {{s.name}}
+            </a>
+          </td>
+          <td>
+            {% for t in i.tags %}
+            <a class="btn btn-sm btn-outline-success" href="/tagged/{{t.slug()}}" role="button">#{{t.slug()}}</a>
+            {% endfor %}
+          </td>
+
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+
+
+
+  </div>
+
+</div>
+
+
+
+
+{% endblock %}

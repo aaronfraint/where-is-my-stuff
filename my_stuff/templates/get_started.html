@@ -15,10 +15,8 @@
     </div>
   </div>
 
-  <div class="row">
-
-
-      <div class="col border-white card mr-2 p-2" style="background: linear-gradient(to bottom right, #33ccff 0%, #ff99cc 100%);">
+  <div class="row mt-4">
+      <div class="col border-light card shadow mr-2" style="background: linear-gradient(to bottom right, #33ccff 0%, #ff99cc 100%);">
         <h1>Log In</h1>
         <form method="POST" action="/getstarted">
           {{ login_form.csrf_token }}
@@ -51,7 +49,7 @@
       </div>
 
 
-      <div class="col card bg-light mr-2 p-2 ">
+      <div class="col card bg-light">
         <h1>Sign Up</h1>
 
         <form method="POST" action="/getstarted">

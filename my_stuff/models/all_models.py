@@ -41,9 +41,6 @@ space_helper = db.Table(
 class Tag(db.Model):
 
     __tablename__ = 'item_tags'
-    __table_args__ = (
-        db.UniqueConstraint('name', 'user_id'),
-    )
 
     uid = db.Column(
         db.Integer,
@@ -52,12 +49,7 @@ class Tag(db.Model):
     name = db.Column(
         db.String(25),
         nullable=False,
-        unique=False
-    )
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey("flasklogin_users.id"),
-        nullable=False
+        unique=True
     )
     background = db.Column(
         db.Text,
@@ -67,7 +59,7 @@ class Tag(db.Model):
     )
 
     def slug(self):
-        return self.name.replace(" ", "-")
+        return self.name.replace(" ", "-").lower()
 
 
 class Item(db.Model):
@@ -126,6 +118,23 @@ class Item(db.Model):
         else:
             return f"- {fancy_qty} {units}"
 
+    def this_container(self):
+        return Container.query.filter_by(
+            uid=self.container_id
+        ).first()
+
+    def this_space(self):
+        return Space.query.filter_by(
+            uid=self.this_container().space_id
+        ).first()
+
+    def container_name(self):
+        return self.this_container().name
+
+    def space_name(self):
+        return self.this_space().name
+
+
 
 class User(UserMixin, db.Model):
     """User account model."""
@@ -177,10 +186,6 @@ class User(UserMixin, db.Model):
         unique=False,
         default=make_random_gradient()
     )
-
-    # spaces = db.relationship("Space", backref=__tablename__, lazy=True)
-    tags = db.relationship("Tag", backref=__tablename__, lazy=True)
-
     spaces = db.relationship(
         'Space',
         secondary=space_helper,
@@ -255,6 +260,17 @@ class Container(db.Model):
         unique=False,
         default=make_random_gradient()
     )
+    lat = db.Column(
+        db.Float,
+        nullable=True,
+        unique=False,
+    )
+    lng = db.Column(
+        db.Float,
+        nullable=True,
+        unique=False,
+    )
+
 
     space_id = db.Column(db.Integer, db.ForeignKey("spaces.uid"), nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey("container_categories.uid"), nullable=False)
@@ -277,6 +293,8 @@ class Container(db.Model):
         ).first()
         return category.name
 
+    def space_name(self):
+        return Space.query.filter_by(uid=self.space_id).first().name
 
 class Space(db.Model):
 
@@ -299,17 +317,17 @@ class Space(db.Model):
         unique=False,
         nullable=False
     )
-    # share_status = db.Column(
-    #     db.String(10),
-    #     unique=False,
-    #     nullable=False,
-    #     default="private"
-    # )
-    # user_id = db.Column(
-    #     db.Integer,
-    #     db.ForeignKey("flasklogin_users.id"),
-    #     nullable=False
-    # )
+
+    lat = db.Column(
+        db.Float,
+        nullable=True,
+        unique=False,
+    )
+    lng = db.Column(
+        db.Float,
+        nullable=True,
+        unique=False,
+    )
 
     users = db.relationship(
         'User',
@@ -318,6 +336,7 @@ class Space(db.Model):
         backref=db.backref('flasklogin_users', lazy=True)
     )
 
+    containers = db.relationship("Container", backref=__tablename__, lazy=True)
 
     container_categories = db.relationship(
         "ContainerCategory",
@@ -331,8 +350,11 @@ class Space(db.Model):
         default=make_random_gradient()
     )
 
+    def num_users(self):
+        return len(self.users)
+
     def share_txt(self):
-        if len(self.users) == 1:
+        if self.num_users() == 1:
             return "Private - not shared with others"
         else:
             other_users = [user.email for user in self.users if user != current_user]

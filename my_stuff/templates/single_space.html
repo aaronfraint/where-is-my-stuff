@@ -28,7 +28,7 @@
       {% if all_item_tags %}
         <p> Filter items in this space by tag:</p>
         {% for tag in all_item_tags %}
-        <a class="btn btn-sm btn-light mb-1" href="/space/{{ space.uid }}/tag/{{ tag.slug() }}" role="button">#{{ tag.slug() }}</a>
+        <a class="btn btn-sm btn-light mb-1" href="/tagged/{{tag.slug()}}" role="button">#{{tag.slug()}}</a>
         {% endfor %}
       {% endif %}
 
@@ -145,7 +145,7 @@
             <td>{{ container.num_items() }}</td>
             <td>
               {% for tag in container.tags() %}
-              <a class="btn btn-sm btn-light mb-1" href="/container/{{ container.uid }}/tag/{{ tag.slug() }}" role="button">#{{ tag.slug() }}</a>
+              <a class="btn btn-sm btn-light mb-1" href="/tagged/{{tag.slug()}}" role="button">#{{tag.slug()}}</a>
               {% endfor %}
             </td>
           </tr>

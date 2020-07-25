@@ -73,6 +73,13 @@ def create_app():
         from my_stuff.routes import containers
         app.register_blueprint(containers.container_bp)
 
+        from my_stuff.routes import tag_filter
+        app.register_blueprint(tag_filter.tag_bp)
+
+        from my_stuff.routes import search
+        app.register_blueprint(search.search_bp)
+
+
         # Create Database Models
         db.create_all()
 

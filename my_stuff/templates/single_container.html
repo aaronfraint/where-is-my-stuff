@@ -112,7 +112,7 @@
           </td>
           <td>
             {% for tag in item.tags %}
-            <a class="btn btn-sm btn-light mb-1" href="/container/{{ container.uid }}/tag/{{ tag.slug() }}" role="button">#{{ tag.slug() }}</a>
+            <a class="btn btn-sm btn-light mb-1" href="/tagged/{{ tag.name }}" role="button">#{{ tag.name }}</a>
             {% endfor %}
           </td>
         </tr>
