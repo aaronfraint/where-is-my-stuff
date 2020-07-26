@@ -48,11 +48,24 @@ def search():
 
     selected_containers = []
     for container in all_containers:
-        if container.name.lower() == search_txt.lower():
+        if container.name.lower() == search_txt.lower() \
+            or search_txt.lower() in container.name.lower():
             selected_containers.append(container)
 
     if len(selected_containers) == 0:
         selected_containers = None
+
+    # See if any items have this name
+    selected_items = []
+    for container in all_containers:
+        for item in container.items:
+            # Perfect match?
+            if item.name.lower() == search_txt.lower() \
+                or search_txt.lower() in item.name.lower():
+                selected_items.append(item)
+
+    if len(selected_items) == 0:
+        selected_items = None
 
     # See if any tags match this search
     search_txt_as_tag = search_txt.replace(" ", "-").lower()
@@ -63,9 +76,22 @@ def search():
 
     # If there's a matching tag, get all items with that tag
     if tag:
-        items = Item.query.join(Item.tags).filter_by(name=search_txt_as_tag).all()
+        tagged_items = Item.query.join(Item.tags).filter_by(name=search_txt_as_tag).all()
     else:
-        items = None
+        tagged_items = None
+
+    if selected_space is None and selected_containers is None \
+        and selected_items is None and tag is None \
+            and tagged_items is None:
+        result_txt = f'Nothing matched the search "{search_txt}"'
+    else:
+        result_txt = ""
+
+    item_count = 0
+    if tagged_items:
+        item_count += len(tagged_items)
+    if selected_items:
+        item_count += len(selected_items)
 
     return render_template(
         'search.html',
@@ -73,8 +99,11 @@ def search():
         search_txt=search_txt,
         selected_space=selected_space,
         selected_containers=selected_containers,
+        selected_items=selected_items,
         tag=tag,
         search_form=SearchForm(),
-        items=items,
-        # containers=containers,
+        tagged_items=tagged_items,
+        result_txt=result_txt,
+        item_count=item_count
     )
+
