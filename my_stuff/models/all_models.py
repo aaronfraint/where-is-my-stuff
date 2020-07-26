@@ -193,8 +193,28 @@ class User(UserMixin, db.Model):
         backref=db.backref('spaces', lazy=True)
     )
 
+    def containers(self):
+        space_id_list = [s.uid for s in self.spaces]
+        all_containers = Container.query.filter(Container.space_id.in_(space_id_list)).all()
+        return all_containers
+
+    def items(self):
+        container_id_list = [c.uid for c in self.containers()]
+        all_items = Item.query.filter(Item.container_id.in_(container_id_list)).all()
+        return all_items
+
+    def item_uids(self):
+        return [i.uid for i in self.items()]
+
     def num_spaces(self):
         return len(self.spaces)
+
+    def num_containers(self):
+        return len(self.containers())
+
+    def num_items(self):
+        return len(self.items())
+
 
     def set_password(self, password):
         """Create hashed password."""
