@@ -115,7 +115,6 @@ def add_item_to_container(container_id):
     db.session.commit()
     flash(f"+ item {item.name}", "success")
 
-
     for error in form.item_name.errors:
         flash(error, "danger")
     for error in form.qty.errors:
@@ -126,5 +125,32 @@ def add_item_to_container(container_id):
         flash(error, "danger")
     for error in form.new_tags.errors:
         flash(error, "danger")
+
+    return redirect(url_for('container_bp.container_by_id', container_id=container_id))
+
+
+
+@container_bp.route('/container/<container_id>/delete/<item_id>', methods=['POST'])
+@login_required
+def delete_item(container_id, item_id):
+
+    # safe_items = current_user.items()
+    # safe_uids = 
+
+    # flash(str(safe_items), "info")
+
+    if int(item_id) in current_user.item_uids():
+        item = Item.query.filter_by(uid=item_id).first()
+
+        if not item:
+            flash("This item does not exist", "danger")
+
+        db.session.delete(item)
+        db.session.commit()
+
+        # Delete
+        flash(f"Deleted item {item.name}", "warning")
+    else:
+        flash("You don't have permission to delete this item", "danger")
 
     return redirect(url_for('container_bp.container_by_id', container_id=container_id))
