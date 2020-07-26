@@ -10,8 +10,8 @@
       <h1>{{ current_user.name }}'s Spaces</h1>
       <ul>
         <li>{{ current_user.num_spaces() }} spaces</li>
-        <li>{{ current_user.num_spaces() }} containers</li>
-        <li>{{ current_user.num_spaces() }} things</li>
+        <li>{{ current_user.num_containers() }} containers</li>
+        <li>{{ current_user.num_items() }} items</li>
       </ul>
       <p></p>
     </div>
@@ -25,7 +25,7 @@
 
         <div class="form-group">
           <label for="space_name">{{ form.space_name.label }}</label>
-          <input type="name" class="form-control" id="space_name" name="space_name" placeholder="e.g. Kitchen">
+          <input type="name" class="form-control shadow" id="space_name" name="space_name" placeholder="e.g. Kitchen">
             {% if form.space_name.errors %}
               <ul class="errors">
                 {% for error in form.space_name.errors %}
@@ -35,7 +35,7 @@
         </div>
         <div class="form-group">
           <label for="description">{{ form.description.label }}</label>
-          <input type="text" class="form-control" id="description" name="description" placeholder="e.g. food and related items">
+          <input type="text" class="form-control shadow" id="description" name="description" placeholder="e.g. food and related items">
             {% if form.description.errors %}
               <ul class="errors">
                 {% for error in form.description.errors %}
@@ -44,7 +44,7 @@
             {% endif %}
         </div>
         <center>
-          <button type="submit" class="btn btn-primary">Add Space</button>
+          <button type="submit" class="btn btn-primary shadow">Add Space</button>
         </center>
       </form>
 
@@ -69,15 +69,21 @@
   {% endwith %}
 
 
+  <div class="row">
+    <div class="col">
+      <h1 class="text-center">
+        Shared Spaces
+      </h1>
+    </div>
+  </div>
+
+
   <div class="row mt-3 row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-2">
-    <h1>
-      Shared Spaces
-    </h1>
 
   {% for space in shared_spaces %}
 
           <div class="col mb-4">
-          <div class="card border-white" style="{{ make_random_gradient()}}">
+          <div class="card border-white shadow" style="{{ make_random_gradient() }}">
               <div class="card-body ">
                 <h5 class="card-title">{{space.name}}</h5>
                 <p class="card-text">{{space.description}}</p>
@@ -90,31 +96,40 @@
       {% endfor %}
     </div>
 
-</div>
-<hr>
-<div class="row mt-3 row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-2">
-  <h1>
-    Private Spaces
-  </h1>
+    <hr>
 
-{% for space in private_spaces %}
-
-        <div class="col mb-4">
-        <div class="card border-white" style="{{ make_random_gradient()}}">
-            <div class="card-body ">
-              <h5 class="card-title">{{space.name}}</h5>
-              <p class="card-text">{{space.description}}</p>
-              <a href="/space/{{space.uid}}">
-                <button type="button" class="btn btn-light btn-sm" >Open</button>
-              </a>
-            </div>
-        </div>
+    <div class="row">
+      <div class="col">
+        <h1 class="text-center">
+          Private Spaces
+        </h1>
       </div>
-    {% endfor %}
-  </div>
+    </div>
+
+    <div class="row mt-3 row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-2">
+      <br>
+    
+    {% for space in private_spaces %}
+    
+            <div class="col mb-4">
+            <div class="card border-white shadow" style="{{ make_random_gradient()}}">
+                <div class="card-body ">
+                  <h5 class="card-title">{{space.name}}</h5>
+                  <p class="card-text">{{space.description}}</p>
+                  <a href="/space/{{space.uid}}">
+                    <button type="button" class="btn btn-light btn-sm" >Open</button>
+                  </a>
+                </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    
+    </div>
+    
+    
 
 </div>
-
 
 
 {% endblock %}

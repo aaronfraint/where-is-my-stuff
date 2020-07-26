@@ -3,11 +3,10 @@
 {% block toprow %}
 <div class="row">
   <!-- Space ... Color gradient, rounded corners -->
-  <div class="col p-5 rounded" style="{{make_random_gradient()}}">
+  <div class="col p-5 rounded shadow" style="{{make_random_gradient()}}">
     <h1>
       {{search_txt}}
       </h1>
-
   </div>
 </div>
 
@@ -20,100 +19,120 @@
 
 {% block content %}
 
-<!-- Search Results -->
-<div class="row mt-4">
-  <div class="col-xl">
-    <h1>Search Results</h1>
-    <ul>
-        {% if selected_space %}
-        <li>
-          Space: 
-        <a href="/space/{{ selected_space.uid }}">
-          {{ selected_space.name }}
-        </a>
-      </li>
-      {% endif %}
 
-      <li>
-        {% if selected_containers %}
-        Containers: 
-        <ul>
-          {% for container in selected_containers %}
-          <li>
-            <a href="/container/{{ container.uid }}">
-              {{ container.name }}
-            </a> in 
-            <a href="/space/{{ container.space_id }}">
-              {{ container.space_name() }}
-            </a>
-          </li>
-          {% endfor %}
-        </ul>
-        {% else %}
-
-        No containers matched this search
-        {% endif %}
-      </li>
-
-
-    </ul>
-
-
-  </div>
-</div>
-
-
-
-
-<!-- Item table -->
 {% if selected_space %}
 <div class="row mt-4">
-  <div class="col-xl">
-    <h1>Space:</h1>
-    {{ selected_space.name }}
+  <div class="col mb-4">
+    <h3>
+      Matching space:
+    </h3>
+    <div class="card border-white shadow" style="{{ make_random_gradient() }} width:30%">
+        <div class="card-body ">
+          <h5 class="card-title">{{selected_space.name}}</h5>
+          <p class="card-text">{{selected_space.description}}</p>
+          <a href="/space/{{selected_space.uid}}">
+            <button type="button" class="btn btn-light btn-sm" >Open</button>
+          </a>
+        </div>
+    </div>
+  </div>
+</div>
+{% endif %}
 
+{% if selected_containers %}
+<div class="row mt-4">
+  <div class="col-12 ">
+
+    <h3>
+      Matching container(s):
+    </h3>
+
+      <div class="card-deck">
+        {% for container in selected_containers %}
+
+        <div class="card border-white shadow mr-2" style="{{ make_random_gradient() }}">
+            <div class="card-body ">
+              <h5 class="card-title">{{container.name}}</h5>
+              <a href="/container/{{container.uid}}">
+                <button type="button" class="btn btn-light btn-sm" >Open</button>
+              </a>
+            </div>
+        </div>
+      {% endfor %}
+  
+      </div>
 
   </div>
 </div>
-
 {% endif %}
 
 
 
-
-
-
-
-
-
-
-
-<!-- Item table -->
-{% if items %}
+{% if item_count > 0 %}
 <div class="row mt-4">
   <div class="col-xl">
-    <h5>
-      The following items were tagged <a class="btn btn-lg btn-success" href="/tagged/{{ search_txt }}" role="button">#{{ search_txt }}</a>
-
-    </h5>
+    <h3>
+      Matching items:
+    </h3>
     <table class="table table-sm">
       <thead>
         <tr>
-          <th scope="col">Item</th>
+          <th scope="col">Name</th>
           <th scope="col">Container</th>
           <th scope="col">Space</th>
           <th scope="col">Tags</th>
         </tr>
       </thead>
       <tbody>
-        {% for item in items %}
+        {% if selected_items %}
+        <tr class="table-secondary text-center font-weight-bold">
+          <td colspan="4">
+            Name == "%{{search_txt}}%"
+          </td>
+        </tr>
+          {% for item in selected_items %}
+          <tr>
+            <th scope="row">{{item.name}}</th>
+            <td>
+              <a href="/container/{{item.container_id}}">
+                {{ item.container_name() }}
+              </a>
+  
+            </td>
+            <td>
+              <a href="/space/{{item.this_space().uid}}">
+                {{ item.space_name() }}
+              </a>
+            </td>
+            <td>
+              {% for t in item.tags %}
+              <a class="btn btn-sm btn-outline-success" href="/tagged/{{t.slug()}}" role="button">#{{t.slug()}}</a>
+              {% endfor %}
+            </td>
+          </tr>
+          {% endfor %}
+        {% endif %}
+
+        {% if tagged_items %}
+        <tr class="table-secondary text-center font-weight-bold">
+          <td colspan="4">
+            Tag == 
+            <a class="btn btn-sm btn-success" href="/tagged/{{tag.slug()}}" role="button">#{{tag.slug()}}</a>
+          </td>
+        </tr>
+        {% for item in tagged_items %}
         <tr>
           <th scope="row">{{item.name}}</th>
           <td>
-            {{ item.container_name() }}
+            <a href="/container/{{item.container_id}}">
+              {{ item.container_name() }}
+            </a>
+
           </td>
           <td>
-            {{ item.space_name() }}
+            <a href="/space/{{item.this_space().uid}}">
+              {{ item.space_name() }}
+            </a>
           </td>
           <td>
             {% for t in item.tags %}
@@ -122,13 +141,12 @@
           </td>
         </tr>
         {% endfor %}
+      {% endif %}
       </tbody>
     </table>
   </div>
 </div>
-
 {% endif %}
-
 
 
 

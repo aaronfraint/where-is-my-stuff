@@ -4,7 +4,7 @@
 {% block toprow %}
   <div class="row">
     <!-- Space name and stats... Color gradient, rounded corners -->
-    <div class="col-md p-5 rounded" style="{{ make_random_gradient() }}">
+    <div class="col-md p-5 rounded shadow" style="{{ make_random_gradient() }}">
       <h1>{{ space.name }}</h1>
       <ul>
         <li>
@@ -48,24 +48,25 @@
 
  
     </div>
-    <div class="col-md">
+    <div class="col-md mt-4">
       <h3>Add a Container</h3>
+      <hr>
       <form method="POST" action="{{ request.path }}/add/container">
           {{ form.csrf_token }}
   
           <!-- Input for container name -->
           <p>Name:</p>
-          <input type="name" class="form-control" id="container_name" name="container_name" placeholder="e.g. B1 or Refridgerator or Backpack">
+          <input type="name" class="form-control shadow" id="container_name" name="container_name" placeholder="e.g. B1 or Refridgerator or Backpack">
   
   
           <hr>
           <!-- Input for a NEW category name -->
           <p>Add a category:</p>
   
-          <input type="name" class="form-control" id="new_category" name="new_category" placeholder="e.g. small box">
+          <input type="name" class="form-control shadow" id="new_category" name="new_category" placeholder="e.g. small box">
   
           <!-- Input to select an EXISTING category name -->
-          <select class="form-control" id="existing_category" name="existing_category">
+          <select class="form-control shadow mt-2" id="existing_category" name="existing_category">
             <option disabled selected value>... or select an existing category</option>
             {% for category in space.container_categories %}
             <option>{{ category.name }}</option>
@@ -74,7 +75,7 @@
   
           <hr>
           <center>
-            <button type="submit" class="btn btn-primary">Add Container</button>
+            <button type="submit" class="btn btn-primary btn-lg shadow">Add Container</button>
           </center>
          
           </form>
