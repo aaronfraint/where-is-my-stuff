@@ -208,7 +208,7 @@ def add_container_to_space(space_id):
         for error in form.existing_category.errors:
             flash(error, "danger")
 
-    return redirect(url_for('container_bp.space_container_by_idby_id', container_id=container.uid))
+    return redirect(url_for('container_bp.container_by_id', container_id=container.uid))
 
 
 @spaces_bp.route('/space/<space_id>/invite', methods=['POST'])
