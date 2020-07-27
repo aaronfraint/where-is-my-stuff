@@ -1,12 +1,20 @@
 from flask_login import current_user
 from datetime import datetime
 from pytz import timezone
-from random import randrange
+from random import randrange, uniform
 
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from my_stuff import db, make_random_gradient
+
+
+def random_lat():
+    return round(uniform(-90, 90), 6)
+
+
+def random_lng():
+    return round(uniform(-180, 180), 6)
 
 
 tag_helper = db.Table(
@@ -284,11 +292,13 @@ class Container(db.Model):
         db.Float,
         nullable=True,
         unique=False,
+        default=random_lat(),
     )
     lng = db.Column(
         db.Float,
         nullable=True,
         unique=False,
+        default=random_lng(),
     )
 
 
@@ -342,11 +352,13 @@ class Space(db.Model):
         db.Float,
         nullable=True,
         unique=False,
+        default=random_lat(),
     )
     lng = db.Column(
         db.Float,
         nullable=True,
         unique=False,
+        default=random_lng(),
     )
 
     users = db.relationship(
