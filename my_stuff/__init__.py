@@ -1,12 +1,29 @@
 """Initialize app."""
+import os
+import platform
 from random import randrange
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 
+from sql_connection import URI_TUNNEL, URI_ON_SERVER
 
 db = SQLAlchemy()
 login_manager = LoginManager()
+
+
+# General Config
+DEBUG = True
+SECRET_KEY = os.urandom(32)
+
+# Database
+SQLALCHEMY_ECHO = False
+SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+if platform.system() == "Darwin":
+    SQLALCHEMY_DATABASE_URI = URI_TUNNEL
+else:
+    SQLALCHEMY_DATABASE_URI = URI_ON_SERVER
 
 
 def make_random_gradient(style: str = "random") -> str:
@@ -51,8 +68,17 @@ def create_app():
     """Construct the core app object."""
     app = Flask(__name__, instance_relative_config=False)
 
-    # Application Configuration
-    app.config.from_object('config.Config')
+    # # Application Configuration
+    # app.config.from_object('config.Config')
+
+    # Pass configuration values
+    app.config["DEBUG"] = DEBUG
+    app.config["SECRET_KEY"] = SECRET_KEY
+    app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
+    app.config["SQLALCHEMY_ECHO"] = SQLALCHEMY_ECHO
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = SQLALCHEMY_TRACK_MODIFICATIONS
+
+
 
     # Initialize Plugins
     db.init_app(app)
@@ -80,8 +106,8 @@ def create_app():
         app.register_blueprint(search.search_bp)
 
 
-        # Create Database Models
-        db.create_all()
+        # # Create Database Models
+        # db.create_all()
 
         # # Compile static assets
         # if app.config['FLASK_ENV'] == 'development':

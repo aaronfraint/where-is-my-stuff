@@ -1,11 +1,14 @@
 
 # A very simple Flask Hello World app for you to get started with...
 
-from flask import Flask
+from my_stuff import create_app, db
 
-app = Flask(__name__)
+app = create_app()
 
-@app.route('/')
-def hello_world():
-    return 'Hello world! Testing123'
 
+if __name__ == "__main__":
+
+    with app.app_context():
+        db.create_all()
+
+    app.run(debug=True)
